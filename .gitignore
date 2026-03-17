@@ -1,0 +1,62 @@
+# === .NET / Visual Studio ===
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.userprefs
+*.vspscc
+*.vssscc
+*.pidb
+*.svclog
+
+.vs/
+.vscode/
+*.code-workspace
+.idea/
+*.sln.iml
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Bb]uild/
+[bB]ld/
+**/out/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Configuración local / secretos
+.env
+.env.*
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Certificados
+*.pfx
+*.cer
+
+# Publicación
+*.publishsettings
