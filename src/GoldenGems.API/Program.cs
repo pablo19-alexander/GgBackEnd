@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
 
 // Add services to the container
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
 // Register all Infrastructure + Application services
@@ -51,6 +52,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");

@@ -1,15 +1,22 @@
 using System.Text;
 using GoldenGems.Application.Interfaces.Admin;
 using GoldenGems.Application.Interfaces.Auth;
+using GoldenGems.Application.Interfaces.Business;
+using GoldenGems.Application.Interfaces.Chat;
+using GoldenGems.Application.Interfaces.Payment;
 using GoldenGems.Application.Interfaces.People;
 using GoldenGems.Application.Services.Admin;
 using GoldenGems.Application.Services.Auth;
+using GoldenGems.Application.Services.Business;
+using GoldenGems.Application.Services.Chat;
+using GoldenGems.Application.Services.Payment;
 using GoldenGems.Application.Services.People;
 using GoldenGems.Domain.Entities.Security;
 using GoldenGems.Domain.Interfaces;
 using GoldenGems.Infrastructure.Authentication;
 using GoldenGems.Infrastructure.Data;
 using GoldenGems.Infrastructure.Repositories;
+using GoldenGems.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +45,17 @@ public static class DependencyInjection
         services.AddScoped<IPersonRepository, PersonRepository>();
         services.AddScoped<IDocumentTypeRepository, DocumentTypeRepository>();
         services.AddScoped<IRegionRepository, RegionRepository>();
+        services.AddScoped<IContactRepository, ContactRepository>();
+        services.AddScoped<IModuleRepository, ModuleRepository>();
+        services.AddScoped<IFormRepository, FormRepository>();
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductImageRepository, ProductImageRepository>();
+        services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
+        services.AddScoped<IConversationRepository, ConversationRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<ICommissionRepository, CommissionRepository>();
 
         // Password Hasher
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -50,6 +68,18 @@ public static class DependencyInjection
         services.AddScoped<IUserValidationService, UserValidationService>();
         services.AddScoped<IDocumentTypeService, DocumentTypeService>();
         services.AddScoped<IRegionService, RegionService>();
+        services.AddScoped<IContactService, ContactService>();
+        services.AddScoped<IPersonService, PersonService>();
+        services.AddScoped<IModuleService, ModuleService>();
+        services.AddScoped<IFormService, FormService>();
+        services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<IProductTypeService, ProductTypeService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IProductImageService, ProductImageService>();
+        services.AddScoped<IImageStorageService, LocalImageStorageService>();
+        services.AddScoped<IUserPreferenceService, UserPreferenceService>();
+        services.AddScoped<IChatService, ChatService>();
+        services.AddScoped<ICommissionService, CommissionService>();
 
         // JWT
         var jwtSection = configuration.GetSection("Jwt");

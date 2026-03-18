@@ -1,4 +1,7 @@
 using GoldenGems.Domain.Entities;
+using GoldenGems.Domain.Entities.Business;
+using GoldenGems.Domain.Entities.Chat;
+using GoldenGems.Domain.Entities.Payment;
 using GoldenGems.Domain.Entities.Security;
 using GoldenGems.Domain.Entities.People;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +27,14 @@ public class GoldenGemsDbContext : DbContext
     public DbSet<Contact> Contacts { get; set; } = default!;
     public DbSet<Region> Regions { get; set; } = default!;
     public DbSet<DocumentType> DocumentTypes { get; set; } = default!;
+    public DbSet<Company> Companies { get; set; } = default!;
+    public DbSet<ProductType> ProductTypes { get; set; } = default!;
+    public DbSet<Product> Products { get; set; } = default!;
+    public DbSet<ProductImage> ProductImages { get; set; } = default!;
+    public DbSet<UserPreference> UserPreferences { get; set; } = default!;
+    public DbSet<Conversation> Conversations { get; set; } = default!;
+    public DbSet<Message> Messages { get; set; } = default!;
+    public DbSet<Commission> Commissions { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -121,5 +132,117 @@ public class GoldenGemsDbContext : DbContext
             .WithMany(r => r.Contacts)
             .HasForeignKey(c => c.RegionId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // Company
+        modelBuilder.Entity<Company>().HasIndex(c => c.Name).IsUnique();
+        modelBuilder.Entity<Company>().HasIndex(c => c.NIT).IsUnique();
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.Owner)
+            .WithMany()
+            .HasForeignKey(c => c.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ProductType
+        modelBuilder.Entity<ProductType>().HasIndex(pt => pt.Code).IsUnique();
+
+        // Product
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.Company)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.ProductType)
+            .WithMany(pt => pt.Products)
+            .HasForeignKey(p => p.ProductTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Product>()
+            .Property(p => p.ReferencePrice)
+            .HasPrecision(18, 2);
+
+        // ProductImage
+        modelBuilder.Entity<ProductImage>()
+            .HasOne(pi => pi.Product)
+            .WithMany(p => p.Images)
+            .HasForeignKey(pi => pi.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // UserPreference
+        modelBuilder.Entity<UserPreference>().HasIndex(up => up.UserId).IsUnique();
+        modelBuilder.Entity<UserPreference>()
+            .HasOne(up => up.User)
+            .WithMany()
+            .HasForeignKey(up => up.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<UserPreference>()
+            .HasOne(up => up.PreferredCompany)
+            .WithMany()
+            .HasForeignKey(up => up.PreferredCompanyId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Conversation
+        modelBuilder.Entity<Conversation>()
+            .HasOne(c => c.Buyer)
+            .WithMany()
+            .HasForeignKey(c => c.BuyerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Conversation>()
+            .HasOne(c => c.Seller)
+            .WithMany()
+            .HasForeignKey(c => c.SellerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Conversation>()
+            .HasOne(c => c.Product)
+            .WithMany()
+            .HasForeignKey(c => c.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Conversation>()
+            .HasOne(c => c.Company)
+            .WithMany()
+            .HasForeignKey(c => c.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Conversation>()
+            .Property(c => c.AgreedPrice)
+            .HasPrecision(18, 2);
+        modelBuilder.Entity<Conversation>()
+            .Property(c => c.Status)
+            .HasConversion<string>();
+
+        // Message
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Conversation)
+            .WithMany(c => c.Messages)
+            .HasForeignKey(m => m.ConversationId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Message>()
+            .HasOne(m => m.Sender)
+            .WithMany()
+            .HasForeignKey(m => m.SenderId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Message>()
+            .Property(m => m.OfferedPrice)
+            .HasPrecision(18, 2);
+        modelBuilder.Entity<Message>()
+            .Property(m => m.MessageType)
+            .HasConversion<string>();
+
+        // Commission
+        modelBuilder.Entity<Commission>().HasIndex(c => c.CompanyId).IsUnique();
+        modelBuilder.Entity<Commission>()
+            .HasOne(c => c.Company)
+            .WithMany()
+            .HasForeignKey(c => c.CompanyId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<Commission>()
+            .Property(c => c.Percentage)
+            .HasPrecision(5, 2);
+        modelBuilder.Entity<Commission>()
+            .Property(c => c.MinAmount)
+            .HasPrecision(18, 2);
+        modelBuilder.Entity<Commission>()
+            .Property(c => c.MaxAmount)
+            .HasPrecision(18, 2);
     }
 }

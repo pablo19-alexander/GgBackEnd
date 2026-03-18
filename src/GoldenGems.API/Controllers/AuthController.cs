@@ -37,4 +37,18 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _authService.CreateUserAsync(request, cancellationToken);
+        if (!result.Success)
+            return BadRequest(result);
+
+        return CreatedAtAction(nameof(CreateUser), new { id = result.Data!.UserId }, result);
+    }
 }

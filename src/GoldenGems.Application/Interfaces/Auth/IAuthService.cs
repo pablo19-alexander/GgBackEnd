@@ -7,4 +7,5 @@ public interface IAuthService : IBaseService
 {
     Task<ApiResponse<AuthResponseDto>> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken = default);
     Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default);
+    Task<ApiResponse<AuthResponseDto>> CreateUserAsync(CreateUserRequestDto request, CancellationToken cancellationToken = default);
 }
