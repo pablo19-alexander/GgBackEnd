@@ -1,7 +1,9 @@
 using GoldenGems.API.Middleware;
+using GoldenGems.Application.Interfaces.Auth;
 using GoldenGems.Domain.Entities.Security;
 using GoldenGems.Infrastructure;
 using GoldenGems.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,11 +64,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Initialize default roles
+// Initialize default roles and admin user
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<GoldenGemsDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasherService>();
 
+    // Create "User" role if it doesn't exist
     if (!context.Roles.Any(r => r.Name.ToLower() == "user"))
     {
         context.Roles.Add(new Role
@@ -74,6 +78,48 @@ using (var scope = app.Services.CreateScope())
             Id = Guid.NewGuid(),
             Name = "User",
             Description = "Rol por defecto para usuarios registrados",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        });
+        await context.SaveChangesAsync();
+    }
+
+    // Create "Admin" role if it doesn't exist
+    if (!context.Roles.Any(r => r.Name.ToLower() == "admin"))
+    {
+        context.Roles.Add(new Role
+        {
+            Id = Guid.NewGuid(),
+            Name = "Admin",
+            Description = "Rol de administrador con acceso total",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        });
+        await context.SaveChangesAsync();
+    }
+
+    // Create admin user if it doesn't exist
+    if (!await context.Users.AnyAsync(u => u.Username.ToLower() == "admin"))
+    {
+        var adminRole = await context.Roles.FirstAsync(r => r.Name.ToLower() == "admin");
+        var adminUser = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "admin@goldengems.com",
+            Username = "admin",
+            PasswordHash = passwordHasher.HashPassword("Admin123*"),
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        context.Users.Add(adminUser);
+        await context.SaveChangesAsync();
+
+        context.Set<UserRole>().Add(new UserRole
+        {
+            Id = Guid.NewGuid(),
+            UserId = adminUser.Id,
+            RoleId = adminRole.Id,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         });

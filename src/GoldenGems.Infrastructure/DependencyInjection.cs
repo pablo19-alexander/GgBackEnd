@@ -66,6 +66,7 @@ public static class DependencyInjection
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IActionService, ActionService>();
         services.AddScoped<IUserValidationService, UserValidationService>();
+        services.AddScoped<IProfileCompletionService, ProfileCompletionService>();
         services.AddScoped<IDocumentTypeService, DocumentTypeService>();
         services.AddScoped<IRegionService, RegionService>();
         services.AddScoped<IContactService, ContactService>();

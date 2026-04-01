@@ -1,5 +1,6 @@
 using GoldenGems.Application.Common;
 using GoldenGems.Application.DTOs.Business;
+using GoldenGems.Application.Interfaces.Auth;
 using GoldenGems.Application.Interfaces.Business;
 using GoldenGems.Domain.Entities.Business;
 using GoldenGems.Domain.Interfaces;
@@ -10,16 +11,25 @@ namespace GoldenGems.Application.Services.Business;
 public class CompanyService : BaseService, ICompanyService
 {
     private readonly ICompanyRepository _companyRepository;
+    private readonly IProfileCompletionService _profileService;
 
-    public CompanyService(ICompanyRepository companyRepository, ILogger<CompanyService> logger) : base(logger)
+    public CompanyService(
+        ICompanyRepository companyRepository,
+        IProfileCompletionService profileService,
+        ILogger<CompanyService> logger) : base(logger)
     {
         _companyRepository = companyRepository;
+        _profileService = profileService;
     }
 
     public async Task<ApiResponse<CompanyResponseDto>> RegisterAsync(CreateCompanyRequestDto request, Guid ownerId, CancellationToken cancellationToken)
     {
         try
         {
+            var profileError = await _profileService.ValidateProfileOrError<CompanyResponseDto>(ownerId, cancellationToken);
+            if (profileError != null)
+                return profileError;
+
             if (await _companyRepository.ExistsByNameAsync(request.Name, cancellationToken))
                 return ApiResponse<CompanyResponseDto>.ErrorResponse("Ya existe una empresa con ese nombre.");
 

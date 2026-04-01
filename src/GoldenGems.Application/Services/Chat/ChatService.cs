@@ -1,5 +1,6 @@
 using GoldenGems.Application.Common;
 using GoldenGems.Application.DTOs.Chat;
+using GoldenGems.Application.Interfaces.Auth;
 using GoldenGems.Application.Interfaces.Chat;
 using GoldenGems.Domain.Entities.Chat;
 using GoldenGems.Domain.Interfaces;
@@ -13,24 +14,31 @@ public class ChatService : BaseService, IChatService
     private readonly IMessageRepository _messageRepository;
     private readonly IProductRepository _productRepository;
     private readonly ICompanyRepository _companyRepository;
+    private readonly IProfileCompletionService _profileService;
 
     public ChatService(
         IConversationRepository conversationRepository,
         IMessageRepository messageRepository,
         IProductRepository productRepository,
         ICompanyRepository companyRepository,
+        IProfileCompletionService profileService,
         ILogger<ChatService> logger) : base(logger)
     {
         _conversationRepository = conversationRepository;
         _messageRepository = messageRepository;
         _productRepository = productRepository;
         _companyRepository = companyRepository;
+        _profileService = profileService;
     }
 
     public async Task<ApiResponse<ConversationResponseDto>> StartConversationAsync(Guid buyerId, Guid productId, CancellationToken cancellationToken)
     {
         try
         {
+            var profileError = await _profileService.ValidateProfileOrError<ConversationResponseDto>(buyerId, cancellationToken);
+            if (profileError != null)
+                return profileError;
+
             var product = await _productRepository.GetByIdWithDetailsAsync(productId, cancellationToken);
             if (product == null)
                 return ApiResponse<ConversationResponseDto>.ErrorResponse("Producto no encontrado.");
@@ -135,6 +143,10 @@ public class ChatService : BaseService, IChatService
     {
         try
         {
+            var profileError = await _profileService.ValidateProfileOrError<MessageResponseDto>(senderId, cancellationToken);
+            if (profileError != null)
+                return profileError;
+
             var conversation = await _conversationRepository.GetByIdWithDetailsAsync(conversationId, cancellationToken);
             if (conversation == null)
                 return ApiResponse<MessageResponseDto>.ErrorResponse("Conversación no encontrada.");
@@ -172,6 +184,10 @@ public class ChatService : BaseService, IChatService
     {
         try
         {
+            var profileError = await _profileService.ValidateProfileOrError<ConversationResponseDto>(userId, cancellationToken);
+            if (profileError != null)
+                return profileError;
+
             var conversation = await _conversationRepository.GetByIdWithDetailsAsync(conversationId, cancellationToken);
             if (conversation == null)
                 return ApiResponse<ConversationResponseDto>.ErrorResponse("Conversación no encontrada.");

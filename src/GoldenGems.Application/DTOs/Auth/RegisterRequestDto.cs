@@ -30,12 +30,10 @@ public class RegisterRequestDto
     [StringLength(100, ErrorMessage = "El segundo apellido no puede exceder 100 caracteres")]
     public string? SecondLastName { get; set; }
 
-    [Required(ErrorMessage = "El tipo de documento es requerido")]
-    public Guid DocumentTypeId { get; set; }
+    public Guid? DocumentTypeId { get; set; }
 
-    [Required(ErrorMessage = "El número de documento es requerido")]
     [StringLength(50, MinimumLength = 5, ErrorMessage = "El número de documento debe tener entre 5 y 50 caracteres")]
-    public string DocumentNumber { get; set; } = string.Empty;
+    public string? DocumentNumber { get; set; }
 
     public List<Guid> RoleIds { get; set; } = new();
 }
