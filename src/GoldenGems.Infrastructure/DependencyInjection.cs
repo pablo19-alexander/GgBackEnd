@@ -81,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<IUserPreferenceService, UserPreferenceService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<ICommissionService, CommissionService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
 
         // JWT
         var jwtSection = configuration.GetSection("Jwt");

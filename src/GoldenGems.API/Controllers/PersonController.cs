@@ -34,6 +34,25 @@ public class PersonController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("me")]
+    public async Task<IActionResult> CreateMe([FromBody] UpdatePersonRequestDto request, CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrWhiteSpace(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized(new { Message = "No se pudo obtener el ID del usuario autenticado" });
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _personService.CreateForUserAsync(userId, request, cancellationToken);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
@@ -65,6 +84,31 @@ public class PersonController : ControllerBase
             return BadRequest(ModelState);
 
         var result = await _personService.UpdateAsync(id, request, cancellationToken);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/photo")]
+    public async Task<IActionResult> UploadPhoto(Guid id, IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { Success = false, Message = "Debe enviar un archivo de imagen" });
+
+        var result = await _personService.UploadPhotoAsync(id, file, cancellationToken);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}/photo")]
+    public async Task<IActionResult> DeletePhoto(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _personService.DeletePhotoAsync(id, cancellationToken);
 
         if (!result.Success)
             return BadRequest(result);

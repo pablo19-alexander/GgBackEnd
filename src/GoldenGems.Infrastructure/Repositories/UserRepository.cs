@@ -81,4 +81,40 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         }
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<List<User>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+            .Include(u => u.Person).ThenInclude(p => p.DocumentType)
+            .AsNoTracking()
+            .OrderByDescending(u => u.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<User?> GetByIdTrackingAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        if (id == Guid.Empty) return null;
+        return await _dbSet.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+    }
+
+    public async Task UpdateRolesAsync(Guid userId, IEnumerable<Guid> roleIds, CancellationToken cancellationToken = default)
+    {
+        var existingRoles = await _context.UserRoles
+            .Where(ur => ur.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+        _context.UserRoles.RemoveRange(existingRoles);
+
+        foreach (var roleId in roleIds)
+        {
+            await _context.UserRoles.AddAsync(new UserRole
+            {
+                UserId = userId,
+                RoleId = roleId
+            }, cancellationToken);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

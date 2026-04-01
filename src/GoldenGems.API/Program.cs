@@ -1,5 +1,6 @@
 using GoldenGems.API.Middleware;
 using GoldenGems.Application.Interfaces.Auth;
+using GoldenGems.Domain.Entities.People;
 using GoldenGems.Domain.Entities.Security;
 using GoldenGems.Infrastructure;
 using GoldenGems.Infrastructure.Data;
@@ -54,6 +55,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// Ensure wwwroot exists for static files (profile photos, product images)
+var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(wwwrootPath);
+app.Environment.WebRootPath = wwwrootPath;
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 
@@ -97,6 +103,33 @@ using (var scope = app.Services.CreateScope())
         });
         await context.SaveChangesAsync();
     }
+
+    // Seed document types (Colombian)
+    var documentTypes = new[]
+    {
+        new { Code = "CC", Name = "Cédula de Ciudadanía" },
+        new { Code = "CE", Name = "Cédula de Extranjería" },
+        new { Code = "TI", Name = "Tarjeta de Identidad" },
+        new { Code = "PA", Name = "Pasaporte" },
+        new { Code = "NIT", Name = "Número de Identificación Tributaria" },
+        new { Code = "PPT", Name = "Permiso por Protección Temporal" },
+    };
+
+    foreach (var dt in documentTypes)
+    {
+        if (!context.DocumentTypes.Any(d => d.Code.ToLower() == dt.Code.ToLower()))
+        {
+            context.DocumentTypes.Add(new DocumentType
+            {
+                Id = Guid.NewGuid(),
+                Code = dt.Code,
+                Name = dt.Name,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+    }
+    await context.SaveChangesAsync();
 
     // Create admin user if it doesn't exist
     if (!await context.Users.AnyAsync(u => u.Username.ToLower() == "admin"))

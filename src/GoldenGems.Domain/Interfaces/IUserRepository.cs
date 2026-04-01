@@ -14,4 +14,7 @@ public interface IUserRepository : IRepository<User>
     Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default);
     Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken = default);
     Task AssignRolesAsync(Guid userId, IEnumerable<Guid> roleIds, CancellationToken cancellationToken = default);
+    Task<List<User>> GetAllWithDetailsAsync(CancellationToken cancellationToken = default);
+    Task<User?> GetByIdTrackingAsync(Guid id, CancellationToken cancellationToken = default);
+    Task UpdateRolesAsync(Guid userId, IEnumerable<Guid> roleIds, CancellationToken cancellationToken = default);
 }

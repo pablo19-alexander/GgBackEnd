@@ -52,7 +52,7 @@ public class AuthService : BaseService, IAuthService
 
         var createdUser = await _userRepository.CreateAsync(user, cancellationToken);
 
-        // Asignar roles
+        // Asignar roles: si se envían roleIds usar esos, si no, asignar rol "User" por defecto
         if (request.RoleIds?.Any() == true)
         {
             var existingRoleIds = await _roleRepository.GetExistingRoleIdsAsync(request.RoleIds, cancellationToken);
@@ -61,6 +61,31 @@ public class AuthService : BaseService, IAuthService
                 await _userRepository.AssignRolesAsync(createdUser.Id, existingRoleIds, cancellationToken);
             }
         }
+        else
+        {
+            var defaultRole = await _roleRepository.GetByNameAsync("User", cancellationToken);
+            if (defaultRole != null)
+            {
+                await _userRepository.AssignRolesAsync(createdUser.Id, new[] { defaultRole.Id }, cancellationToken);
+            }
+        }
+
+        // Crear Person asociado al usuario
+        var person = new Person
+        {
+            Id = Guid.NewGuid(),
+            FirstName = request.FirstName.Trim(),
+            SecondName = request.SecondName?.Trim() ?? string.Empty,
+            FirstLastName = request.FirstLastName.Trim(),
+            SecondLastName = request.SecondLastName?.Trim() ?? string.Empty,
+            DocumentTypeId = request.DocumentTypeId ?? Guid.Empty,
+            DocumentNumber = request.DocumentNumber?.Trim() ?? string.Empty,
+            UserId = createdUser.Id,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _personRepository.CreateAsync(person, cancellationToken);
 
         var userWithRoles = await _userRepository.GetByIdWithRolesAsync(createdUser.Id, cancellationToken);
         return BuildAuthSuccessResponse(userWithRoles!, "Usuario registrado correctamente.");

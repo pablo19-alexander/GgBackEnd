@@ -14,6 +14,7 @@ public class Person : BaseEntity
     public string DocumentNumber { get; set; } = string.Empty;
     public Guid DocumentTypeId { get; set; }
     public Guid? ContactId { get; set; }
+    public string? PhotoUrl { get; set; }
     public Guid UserId { get; set; }
     public DocumentType? DocumentType { get; set; }
     public Contact? Contact { get; set; }

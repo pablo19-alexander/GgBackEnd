@@ -9,6 +9,7 @@ public class PersonResponseDto
     public string? SecondLastName { get; set; }
     public string? DocumentNumber { get; set; }
     public Guid DocumentTypeId { get; set; }
+    public string? PhotoUrl { get; set; }
     public Guid? ContactId { get; set; }
     public Guid UserId { get; set; }
     public bool IsActive { get; set; }
