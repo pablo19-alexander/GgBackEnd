@@ -17,6 +17,21 @@ public class ContactService : BaseService, IContactService
         _contactRepository = contactRepository ?? throw new ArgumentNullException(nameof(contactRepository));
     }
 
+    public async Task<ApiResponse<List<ContactResponseDto>>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var contacts = await _contactRepository.GetAllActiveAsync(cancellationToken);
+            var dtos = contacts.Select(MapToDto).ToList();
+            return ApiResponse<List<ContactResponseDto>>.SuccessResponse(dtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener contactos");
+            return ApiResponse<List<ContactResponseDto>>.ErrorResponse("Error al obtener los contactos");
+        }
+    }
+
     public async Task<ApiResponse<ContactResponseDto>> CreateAsync(CreateContactRequestDto request, CancellationToken cancellationToken)
     {
         try

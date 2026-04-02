@@ -35,6 +35,8 @@ public class GoldenGemsDbContext : DbContext
     public DbSet<Conversation> Conversations { get; set; } = default!;
     public DbSet<Message> Messages { get; set; } = default!;
     public DbSet<Commission> Commissions { get; set; } = default!;
+    public DbSet<Order> Orders { get; set; } = default!;
+    public DbSet<GoldenGems.Domain.Entities.Payment.Payment> Payments { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -244,5 +246,50 @@ public class GoldenGemsDbContext : DbContext
         modelBuilder.Entity<Commission>()
             .Property(c => c.MaxAmount)
             .HasPrecision(18, 2);
+        // Order
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Conversation)
+            .WithMany()
+            .HasForeignKey(o => o.ConversationId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Buyer)
+            .WithMany()
+            .HasForeignKey(o => o.BuyerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Seller)
+            .WithMany()
+            .HasForeignKey(o => o.SellerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Product)
+            .WithMany()
+            .HasForeignKey(o => o.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Company)
+            .WithMany()
+            .HasForeignKey(o => o.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Order>().Property(o => o.AgreedPrice).HasPrecision(18, 2);
+        modelBuilder.Entity<Order>().Property(o => o.CommissionPercentage).HasPrecision(5, 2);
+        modelBuilder.Entity<Order>().Property(o => o.CommissionAmount).HasPrecision(18, 2);
+        modelBuilder.Entity<Order>().Property(o => o.SellerAmount).HasPrecision(18, 2);
+        modelBuilder.Entity<Order>().Property(o => o.Status).HasConversion<string>();
+        modelBuilder.Entity<Order>().HasIndex(o => o.ConversationId).IsUnique();
+
+        // Payment
+        modelBuilder.Entity<GoldenGems.Domain.Entities.Payment.Payment>()
+            .HasOne(p => p.Order)
+            .WithMany(o => o.Payments)
+            .HasForeignKey(p => p.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<GoldenGems.Domain.Entities.Payment.Payment>()
+            .Property(p => p.Amount).HasPrecision(18, 2);
+        modelBuilder.Entity<GoldenGems.Domain.Entities.Payment.Payment>()
+            .Property(p => p.Method).HasConversion<string>();
+        modelBuilder.Entity<GoldenGems.Domain.Entities.Payment.Payment>()
+            .Property(p => p.Status).HasConversion<string>();
     }
 }

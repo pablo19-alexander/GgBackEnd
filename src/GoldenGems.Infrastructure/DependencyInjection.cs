@@ -56,6 +56,8 @@ public static class DependencyInjection
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<ICommissionRepository, CommissionRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
 
         // Password Hasher
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -81,6 +83,8 @@ public static class DependencyInjection
         services.AddScoped<IUserPreferenceService, UserPreferenceService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<ICommissionService, CommissionService>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IAdminUserService, AdminUserService>();
 
         // JWT
