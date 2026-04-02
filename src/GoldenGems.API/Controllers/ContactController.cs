@@ -17,6 +17,16 @@ public class ContactController : ControllerBase
         _contactService = contactService ?? throw new ArgumentNullException(nameof(contactService));
     }
 
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await _contactService.GetAllAsync(cancellationToken);
+        if (!result.Success)
+            return BadRequest(result);
+        return Ok(result);
+    }
+
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateContactRequestDto request, CancellationToken cancellationToken)
     {

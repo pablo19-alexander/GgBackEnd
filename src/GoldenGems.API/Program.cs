@@ -1,3 +1,4 @@
+using GoldenGems.API.Hubs;
 using GoldenGems.API.Middleware;
 using GoldenGems.Application.Interfaces.Auth;
 using GoldenGems.Domain.Entities.People;
@@ -13,18 +14,20 @@ builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true
 // Add services to the container
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 // Register all Infrastructure + Application services
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Add CORS
+// Add CORS (AllowCredentials required for SignalR)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -69,6 +72,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 // Initialize default roles and admin user
 using (var scope = app.Services.CreateScope())
