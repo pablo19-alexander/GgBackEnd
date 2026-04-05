@@ -18,5 +18,5 @@ public class CreateContactRequestDto
     [StringLength(200, ErrorMessage = "El barrio no puede exceder 200 caracteres")]
     public string? Neighborhood { get; set; }
 
-    public Guid? RegionId { get; set; }
+    public Guid? MunicipalityId { get; set; }
 }

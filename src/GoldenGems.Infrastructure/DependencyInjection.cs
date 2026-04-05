@@ -44,7 +44,8 @@ public static class DependencyInjection
         services.AddScoped<IActionTypeRepository, ActionTypeRepository>();
         services.AddScoped<IPersonRepository, PersonRepository>();
         services.AddScoped<IDocumentTypeRepository, DocumentTypeRepository>();
-        services.AddScoped<IRegionRepository, RegionRepository>();
+        services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        services.AddScoped<IMunicipalityRepository, MunicipalityRepository>();
         services.AddScoped<IContactRepository, ContactRepository>();
         services.AddScoped<IModuleRepository, ModuleRepository>();
         services.AddScoped<IFormRepository, FormRepository>();
@@ -70,7 +71,8 @@ public static class DependencyInjection
         services.AddScoped<IUserValidationService, UserValidationService>();
         services.AddScoped<IProfileCompletionService, ProfileCompletionService>();
         services.AddScoped<IDocumentTypeService, DocumentTypeService>();
-        services.AddScoped<IRegionService, RegionService>();
+        services.AddScoped<IDepartmentService, DepartmentService>();
+        services.AddScoped<IMunicipalityService, MunicipalityService>();
         services.AddScoped<IContactService, ContactService>();
         services.AddScoped<IPersonService, PersonService>();
         services.AddScoped<IModuleService, ModuleService>();

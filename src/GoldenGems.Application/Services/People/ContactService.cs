@@ -49,7 +49,7 @@ public class ContactService : BaseService, IContactService
                 Email = request.Email?.Trim() ?? string.Empty,
                 Address = request.Address?.Trim() ?? string.Empty,
                 Neighborhood = request.Neighborhood?.Trim() ?? string.Empty,
-                RegionId = request.RegionId,
+                MunicipalityId = request.MunicipalityId,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
@@ -103,7 +103,7 @@ public class ContactService : BaseService, IContactService
             contact.Email = request.Email?.Trim() ?? contact.Email;
             contact.Address = request.Address?.Trim() ?? contact.Address;
             contact.Neighborhood = request.Neighborhood?.Trim() ?? contact.Neighborhood;
-            contact.RegionId = request.RegionId ?? contact.RegionId;
+            contact.MunicipalityId = request.MunicipalityId ?? contact.MunicipalityId;
 
             var updated = await _contactRepository.UpdateAsync(contact, cancellationToken);
             var dto = MapToDto(updated);
@@ -149,7 +149,7 @@ public class ContactService : BaseService, IContactService
             Email = contact.Email,
             Address = contact.Address,
             Neighborhood = contact.Neighborhood,
-            RegionId = contact.RegionId,
+            MunicipalityId = contact.MunicipalityId,
             IsActive = contact.IsActive,
             CreatedAt = contact.CreatedAt
         };

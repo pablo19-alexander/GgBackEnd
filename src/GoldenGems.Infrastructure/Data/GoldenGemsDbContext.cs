@@ -25,7 +25,8 @@ public class GoldenGemsDbContext : DbContext
     public DbSet<UserRole> UserRoles { get; set; } = default!;
     public DbSet<Person> People { get; set; } = default!;
     public DbSet<Contact> Contacts { get; set; } = default!;
-    public DbSet<Region> Regions { get; set; } = default!;
+    public DbSet<Department> Departments { get; set; } = default!;
+    public DbSet<Municipality> Municipalities { get; set; } = default!;
     public DbSet<DocumentType> DocumentTypes { get; set; } = default!;
     public DbSet<Company> Companies { get; set; } = default!;
     public DbSet<ProductType> ProductTypes { get; set; } = default!;
@@ -128,11 +129,29 @@ public class GoldenGemsDbContext : DbContext
             .HasForeignKey(p => p.ContactId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Contact -> Region
+        // Department
+        modelBuilder.Entity<Department>().HasIndex(d => d.Code).IsUnique();
+        modelBuilder.Entity<Department>().Property(d => d.Code).HasMaxLength(2);
+        modelBuilder.Entity<Department>().Property(d => d.Name).HasMaxLength(100);
+
+        // Municipality
+        modelBuilder.Entity<Municipality>().HasIndex(m => m.Code).IsUnique();
+        modelBuilder.Entity<Municipality>().HasIndex(m => m.DepartmentId);
+        modelBuilder.Entity<Municipality>().Property(m => m.Code).HasMaxLength(5);
+        modelBuilder.Entity<Municipality>().Property(m => m.Name).HasMaxLength(100);
+        modelBuilder.Entity<Municipality>().Property(m => m.Latitude).HasPrecision(9, 6);
+        modelBuilder.Entity<Municipality>().Property(m => m.Longitude).HasPrecision(9, 6);
+        modelBuilder.Entity<Municipality>()
+            .HasOne(m => m.Department)
+            .WithMany(d => d.Municipalities)
+            .HasForeignKey(m => m.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Contact -> Municipality
         modelBuilder.Entity<Contact>()
-            .HasOne(c => c.Region)
-            .WithMany(r => r.Contacts)
-            .HasForeignKey(c => c.RegionId)
+            .HasOne(c => c.Municipality)
+            .WithMany(m => m.Contacts)
+            .HasForeignKey(c => c.MunicipalityId)
             .OnDelete(DeleteBehavior.SetNull);
 
         // Company

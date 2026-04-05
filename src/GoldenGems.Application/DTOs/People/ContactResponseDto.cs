@@ -7,7 +7,7 @@ public class ContactResponseDto
     public string? Email { get; set; }
     public string? Address { get; set; }
     public string? Neighborhood { get; set; }
-    public Guid? RegionId { get; set; }
+    public Guid? MunicipalityId { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
 }

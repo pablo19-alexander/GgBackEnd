@@ -9,7 +9,7 @@ public class Contact : BaseEntity
     public string Email { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string Neighborhood { get; set; } = string.Empty;
-    public Guid? RegionId { get; set; }
-    public Region? Region { get; set; }
+    public Guid? MunicipalityId { get; set; }
+    public Municipality? Municipality { get; set; }
     public ICollection<Person> People { get; set; } = new List<Person>();
 }
