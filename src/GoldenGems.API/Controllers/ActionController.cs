@@ -41,4 +41,20 @@ public class ActionController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateAction(Guid id, [FromBody] CreateActionRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var result = await _actionService.UpdateActionAsync(id, request, cancellationToken);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteAction(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _actionService.DeleteActionAsync(id, cancellationToken);
+        return result.Success ? Ok(result) : NotFound(result);
+    }
 }

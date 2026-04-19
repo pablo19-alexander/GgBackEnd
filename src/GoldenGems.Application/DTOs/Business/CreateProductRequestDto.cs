@@ -17,7 +17,7 @@ public class CreateProductRequestDto
     public bool IsNegotiable { get; set; }
 
     [StringLength(500)]
-    public string WhatsAppMessage { get; set; } = string.Empty;
+    public string InitialChatMessage { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "La empresa es requerida")]
     public Guid CompanyId { get; set; }

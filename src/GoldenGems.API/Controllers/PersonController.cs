@@ -53,6 +53,21 @@ public class PersonController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("admin/{userId:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> CreateForUser(Guid userId, [FromBody] UpdatePersonRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _personService.CreateForUserAsync(userId, request, cancellationToken);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)

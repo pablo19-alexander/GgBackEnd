@@ -57,6 +57,57 @@ public class RoleService : BaseService, IRoleService
         }
     }
 
+    public async Task<ApiResponse<RoleResponseDto>> UpdateRoleAsync(Guid id, CreateRoleRequestDto request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var role = await _roleRepository.GetByIdAsync(id, cancellationToken);
+            if (role == null || !role.IsActive)
+                return ApiResponse<RoleResponseDto>.ErrorResponse("Rol no encontrado");
+
+            if (string.IsNullOrWhiteSpace(request.Name))
+                return ApiResponse<RoleResponseDto>.ErrorResponse("El nombre del rol es requerido");
+
+            var name = request.Name.Trim();
+            if (!string.Equals(role.Name, name, StringComparison.OrdinalIgnoreCase)
+                && await _roleRepository.ExistsByNameAsync(name, cancellationToken))
+            {
+                return ApiResponse<RoleResponseDto>.ErrorResponse($"Ya existe un rol con el nombre '{name}'");
+            }
+
+            role.Name = name;
+            role.Description = request.Description?.Trim() ?? string.Empty;
+
+            var updated = await _roleRepository.UpdateAsync(role, cancellationToken);
+            _logger.LogInformation("Rol actualizado: {Name} (ID: {Id})", updated.Name, updated.Id);
+            return ApiResponse<RoleResponseDto>.SuccessResponse(MapRoleToDto(updated), "Rol actualizado exitosamente");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al actualizar rol: {Id}", id);
+            return ApiResponse<RoleResponseDto>.ErrorResponse("Error al actualizar el rol");
+        }
+    }
+
+    public async Task<ApiResponse<RoleResponseDto>> DeleteRoleAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var role = await _roleRepository.GetByIdAsync(id, cancellationToken);
+            if (role == null || !role.IsActive)
+                return ApiResponse<RoleResponseDto>.ErrorResponse("Rol no encontrado");
+
+            var deleted = await _roleRepository.DeleteAsync(role, cancellationToken);
+            _logger.LogInformation("Rol desactivado: {Name} (ID: {Id})", deleted.Name, deleted.Id);
+            return ApiResponse<RoleResponseDto>.SuccessResponse(MapRoleToDto(deleted), "Rol eliminado exitosamente");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar rol: {Id}", id);
+            return ApiResponse<RoleResponseDto>.ErrorResponse("Error al eliminar el rol");
+        }
+    }
+
     public async Task<ApiResponse<List<RoleResponseDto>>> GetAllRolesAsync(CancellationToken cancellationToken)
     {
         try

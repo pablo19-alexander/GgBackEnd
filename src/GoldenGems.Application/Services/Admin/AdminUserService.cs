@@ -62,6 +62,35 @@ public class AdminUserService : IAdminUserService
         }
     }
 
+    public async Task<ApiResponse<List<AvailableUserDto>>> GetUsersWithoutPersonAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var users = await _userRepository.GetAllWithDetailsAsync(cancellationToken);
+
+            // Solo usuarios activos cuya Person esté ausente o inactiva (invariante 1:1 protegida)
+            var available = users
+                .Where(u => u.IsActive && (u.Person == null || !u.Person.IsActive))
+                .Select(u => new AvailableUserDto
+                {
+                    UserId = u.Id,
+                    Email = u.Email,
+                    Username = u.Username
+                })
+                .ToList();
+
+            return ApiResponse<List<AvailableUserDto>>.SuccessResponse(
+                available,
+                $"Se encontraron {available.Count} usuarios disponibles"
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener usuarios sin persona");
+            return ApiResponse<List<AvailableUserDto>>.ErrorResponse("Error al obtener los usuarios disponibles");
+        }
+    }
+
     public async Task<ApiResponse<bool>> ChangePasswordAsync(Guid userId, AdminChangePasswordRequestDto request, CancellationToken cancellationToken = default)
     {
         try

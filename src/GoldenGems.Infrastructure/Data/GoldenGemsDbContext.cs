@@ -310,5 +310,16 @@ public class GoldenGemsDbContext : DbContext
             .Property(p => p.Method).HasConversion<string>();
         modelBuilder.Entity<GoldenGems.Domain.Entities.Payment.Payment>()
             .Property(p => p.Status).HasConversion<string>();
+
+        // Seed: ActionTypes base
+        var seedDate = new DateTime(2026, 4, 18, 0, 0, 0, DateTimeKind.Utc);
+        modelBuilder.Entity<ActionType>().HasData(
+            new ActionType { Id = new Guid("11111111-1111-1111-1111-000000000001"), Code = "READ", Description = "Operaciones de lectura o consulta", IsActive = true, CreatedAt = seedDate },
+            new ActionType { Id = new Guid("11111111-1111-1111-1111-000000000002"), Code = "WRITE", Description = "Operaciones de creación", IsActive = true, CreatedAt = seedDate },
+            new ActionType { Id = new Guid("11111111-1111-1111-1111-000000000003"), Code = "UPDATE", Description = "Operaciones de edición o actualización", IsActive = true, CreatedAt = seedDate },
+            new ActionType { Id = new Guid("11111111-1111-1111-1111-000000000004"), Code = "DELETE", Description = "Operaciones de eliminación", IsActive = true, CreatedAt = seedDate },
+            new ActionType { Id = new Guid("11111111-1111-1111-1111-000000000005"), Code = "EXPORT", Description = "Exportación de datos", IsActive = true, CreatedAt = seedDate },
+            new ActionType { Id = new Guid("11111111-1111-1111-1111-000000000006"), Code = "EXECUTE", Description = "Ejecución de procesos", IsActive = true, CreatedAt = seedDate }
+        );
     }
 }

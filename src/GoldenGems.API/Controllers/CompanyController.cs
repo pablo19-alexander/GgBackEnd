@@ -32,6 +32,18 @@ public class CompanyController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpPost("admin/register")]
+    public async Task<IActionResult> AdminRegister([FromBody] AdminCreateCompanyRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var result = await _companyService.AdminRegisterAsync(request, cancellationToken);
+        if (!result.Success) return BadRequest(result);
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
+    }
+
     [AllowAnonymous]
     [HttpGet("all")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -58,6 +70,14 @@ public class CompanyController : ControllerBase
         if (userId == null) return Unauthorized();
 
         var result = await _companyService.UpdateAsync(id, request, userId.Value, cancellationToken);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [Authorize]
+    [HttpPost("{id:guid}/logo")]
+    public async Task<IActionResult> UploadLogo(Guid id, IFormFile file, CancellationToken cancellationToken)
+    {
+        var result = await _companyService.UploadLogoAsync(id, file, cancellationToken);
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

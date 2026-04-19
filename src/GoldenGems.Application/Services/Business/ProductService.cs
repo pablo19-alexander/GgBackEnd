@@ -40,7 +40,7 @@ public class ProductService : BaseService, IProductService
                 Description = request.Description?.Trim() ?? string.Empty,
                 ReferencePrice = request.ReferencePrice,
                 IsNegotiable = request.IsNegotiable,
-                WhatsAppMessage = request.WhatsAppMessage?.Trim() ?? string.Empty,
+                InitialChatMessage = request.InitialChatMessage?.Trim() ?? string.Empty,
                 CompanyId = request.CompanyId,
                 ProductTypeId = request.ProductTypeId
             };
@@ -130,7 +130,7 @@ public class ProductService : BaseService, IProductService
             product.Description = request.Description?.Trim() ?? string.Empty;
             product.ReferencePrice = request.ReferencePrice;
             product.IsNegotiable = request.IsNegotiable;
-            product.WhatsAppMessage = request.WhatsAppMessage?.Trim() ?? string.Empty;
+            product.InitialChatMessage = request.InitialChatMessage?.Trim() ?? string.Empty;
             product.CompanyId = request.CompanyId;
             product.ProductTypeId = request.ProductTypeId;
 
@@ -202,7 +202,7 @@ public class ProductService : BaseService, IProductService
         Description = p.Description,
         ReferencePrice = p.ReferencePrice,
         IsNegotiable = p.IsNegotiable,
-        WhatsAppMessage = p.WhatsAppMessage,
+        InitialChatMessage = p.InitialChatMessage,
         CompanyId = p.CompanyId,
         CompanyName = p.Company?.Name ?? string.Empty,
         CompanyLogo = p.Company?.Logo ?? string.Empty,

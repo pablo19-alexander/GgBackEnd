@@ -24,6 +24,13 @@ public class AdminUserController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    [HttpGet("without-person")]
+    public async Task<IActionResult> GetUsersWithoutPerson(CancellationToken cancellationToken)
+    {
+        var result = await _adminUserService.GetUsersWithoutPersonAsync(cancellationToken);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     [HttpPut("{userId:guid}/password")]
     public async Task<IActionResult> ChangePassword(Guid userId, [FromBody] AdminChangePasswordRequestDto request, CancellationToken cancellationToken)
     {

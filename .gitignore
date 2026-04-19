@@ -60,3 +60,7 @@ appsettings.*.local.json
 
 # Publicación
 *.publishsettings
+
+# Uploads de usuarios (imágenes, archivos) — no versionar, van a storage externo
+src/GoldenGems.API/wwwroot/uploads/**
+!src/GoldenGems.API/wwwroot/uploads/.gitkeep

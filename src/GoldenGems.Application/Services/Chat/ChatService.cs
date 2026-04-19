@@ -60,6 +60,21 @@ public class ChatService : BaseService, IChatService
             };
 
             var created = await _conversationRepository.CreateAsync(conversation, cancellationToken);
+
+            // Primer mensaje automático: usa InitialChatMessage del producto si existe; si no, genera uno por defecto.
+            var initialContent = !string.IsNullOrWhiteSpace(product.InitialChatMessage)
+                ? product.InitialChatMessage
+                : $"Hola, estoy interesado en \"{product.Name}\". Precio de referencia: ${product.ReferencePrice:N0}. ¿Podemos conversar?";
+
+            await _messageRepository.CreateAsync(new Message
+            {
+                ConversationId = created.Id,
+                SenderId = buyerId,
+                Content = initialContent,
+                MessageType = MessageType.Text,
+                SentAt = DateTime.UtcNow
+            }, cancellationToken);
+
             var detail = await _conversationRepository.GetByIdWithDetailsAsync(created.Id, cancellationToken);
             return ApiResponse<ConversationResponseDto>.SuccessResponse(MapConversation(detail!), "Conversación iniciada.");
         }
@@ -294,8 +309,8 @@ public class ChatService : BaseService, IChatService
             if (company == null || string.IsNullOrWhiteSpace(company.WhatsAppNumber))
                 return ApiResponse<string>.ErrorResponse("La empresa no tiene número de WhatsApp configurado.");
 
-            var message = !string.IsNullOrWhiteSpace(product.WhatsAppMessage)
-                ? product.WhatsAppMessage
+            var message = !string.IsNullOrWhiteSpace(product.InitialChatMessage)
+                ? product.InitialChatMessage
                 : $"Hola, estoy interesado en el producto \"{product.Name}\" de {company.Name}. Precio de referencia: ${product.ReferencePrice:N2}. ¿Podemos negociar?";
 
             var encodedMessage = Uri.EscapeDataString(message);

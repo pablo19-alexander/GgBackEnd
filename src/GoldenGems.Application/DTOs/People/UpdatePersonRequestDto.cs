@@ -8,7 +8,6 @@ public class UpdatePersonRequestDto
     [StringLength(100, ErrorMessage = "El primer nombre no puede exceder 100 caracteres")]
     public string? FirstName { get; set; }
 
-    [Required(ErrorMessage = "El segundo nombre es requerido")]
     [StringLength(100, ErrorMessage = "El segundo nombre no puede exceder 100 caracteres")]
     public string? SecondName { get; set; }
 
@@ -16,7 +15,6 @@ public class UpdatePersonRequestDto
     [StringLength(100, ErrorMessage = "El primer apellido no puede exceder 100 caracteres")]
     public string? FirstLastName { get; set; }
 
-    [Required(ErrorMessage = "El segundo apellido es requerido")]
     [StringLength(100, ErrorMessage = "El segundo apellido no puede exceder 100 caracteres")]
     public string? SecondLastName { get; set; }
 
@@ -48,4 +46,7 @@ public class UpdatePersonRequestDto
 
     [Required(ErrorMessage = "El municipio es requerido")]
     public Guid? MunicipalityId { get; set; }
+
+    // Opcional: solo lo usa el admin para activar/desactivar
+    public bool? IsActive { get; set; }
 }

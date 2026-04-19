@@ -59,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<ICommissionRepository, CommissionRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IDashboardRepository, DashboardRepository>();
 
         // Password Hasher
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
@@ -68,6 +69,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IActionService, ActionService>();
+        services.AddScoped<IActionTypeService, ActionTypeService>();
         services.AddScoped<IUserValidationService, UserValidationService>();
         services.AddScoped<IProfileCompletionService, ProfileCompletionService>();
         services.AddScoped<IDocumentTypeService, DocumentTypeService>();
@@ -88,6 +90,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IAdminUserService, AdminUserService>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         // JWT
         var jwtSection = configuration.GetSection("Jwt");

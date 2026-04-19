@@ -80,6 +80,68 @@ public class ActionService : BaseService, IActionService
         }
     }
 
+    public async Task<ApiResponse<ActionResponseDto>> UpdateActionAsync(Guid id, CreateActionRequestDto request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var action = await _actionRepository.GetByIdAsync(id, cancellationToken);
+            if (action == null || !action.IsActive)
+                return ApiResponse<ActionResponseDto>.ErrorResponse("Acción no encontrada");
+
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Code))
+                return ApiResponse<ActionResponseDto>.ErrorResponse("Nombre y código son requeridos");
+
+            if (request.ActionTypeId == Guid.Empty)
+                return ApiResponse<ActionResponseDto>.ErrorResponse("El tipo de acción es requerido");
+
+            var actionType = await _actionTypeRepository.GetByIdAsync(request.ActionTypeId, cancellationToken);
+            if (actionType is null)
+                return ApiResponse<ActionResponseDto>.ErrorResponse("El tipo de acción especificado no existe");
+
+            var code = request.Code.Trim().ToUpper();
+            if (!string.Equals(action.Code, code, StringComparison.OrdinalIgnoreCase)
+                && await _actionRepository.ExistsByCodeAsync(code, cancellationToken))
+            {
+                return ApiResponse<ActionResponseDto>.ErrorResponse($"Ya existe una acción con el código '{code}'");
+            }
+
+            action.Name = request.Name.Trim();
+            action.Code = code;
+            action.Description = request.Description?.Trim() ?? string.Empty;
+            action.ActionTypeId = actionType.Id;
+            action.ActionType = actionType;
+
+            var updated = await _actionRepository.UpdateAsync(action, cancellationToken);
+            updated.ActionType = actionType;
+            _logger.LogInformation("Acción actualizada: {Code} (ID: {Id})", updated.Code, updated.Id);
+            return ApiResponse<ActionResponseDto>.SuccessResponse(MapActionToDto(updated), "Acción actualizada exitosamente");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al actualizar acción: {Id}", id);
+            return ApiResponse<ActionResponseDto>.ErrorResponse("Error al actualizar la acción");
+        }
+    }
+
+    public async Task<ApiResponse<ActionResponseDto>> DeleteActionAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var action = await _actionRepository.GetByIdAsync(id, cancellationToken);
+            if (action == null || !action.IsActive)
+                return ApiResponse<ActionResponseDto>.ErrorResponse("Acción no encontrada");
+
+            var deleted = await _actionRepository.DeleteAsync(action, cancellationToken);
+            _logger.LogInformation("Acción desactivada: {Code} (ID: {Id})", deleted.Code, deleted.Id);
+            return ApiResponse<ActionResponseDto>.SuccessResponse(MapActionToDto(deleted), "Acción eliminada exitosamente");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar acción: {Id}", id);
+            return ApiResponse<ActionResponseDto>.ErrorResponse("Error al eliminar la acción");
+        }
+    }
+
     public async Task<ApiResponse<List<ActionResponseDto>>> GetAllActionsAsync(CancellationToken cancellationToken)
     {
         try

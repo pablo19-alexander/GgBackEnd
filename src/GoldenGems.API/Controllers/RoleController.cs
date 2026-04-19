@@ -41,4 +41,20 @@ public class RoleController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateRole(Guid id, [FromBody] CreateRoleRequestDto request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var result = await _roleService.UpdateRoleAsync(id, request, cancellationToken);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteRole(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _roleService.DeleteRoleAsync(id, cancellationToken);
+        return result.Success ? Ok(result) : NotFound(result);
+    }
 }

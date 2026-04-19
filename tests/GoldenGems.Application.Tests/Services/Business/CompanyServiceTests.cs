@@ -2,6 +2,7 @@ using FluentAssertions;
 using GoldenGems.Application.Common;
 using GoldenGems.Application.DTOs.Business;
 using GoldenGems.Application.Interfaces.Auth;
+using GoldenGems.Application.Interfaces.Business;
 using GoldenGems.Application.Services.Business;
 using GoldenGems.Domain.Entities.Business;
 using GoldenGems.Domain.Interfaces;
@@ -14,6 +15,9 @@ public class CompanyServiceTests
 {
     private readonly Mock<ICompanyRepository> _companyRepositoryMock;
     private readonly Mock<IProfileCompletionService> _profileServiceMock;
+    private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<IRoleRepository> _roleRepositoryMock;
+    private readonly Mock<IImageStorageService> _storageServiceMock;
     private readonly Mock<ILogger<CompanyService>> _loggerMock;
     private readonly CompanyService _sut;
 
@@ -21,8 +25,17 @@ public class CompanyServiceTests
     {
         _companyRepositoryMock = new Mock<ICompanyRepository>();
         _profileServiceMock = new Mock<IProfileCompletionService>();
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _roleRepositoryMock = new Mock<IRoleRepository>();
+        _storageServiceMock = new Mock<IImageStorageService>();
         _loggerMock = new Mock<ILogger<CompanyService>>();
-        _sut = new CompanyService(_companyRepositoryMock.Object, _profileServiceMock.Object, _loggerMock.Object);
+        _sut = new CompanyService(
+            _companyRepositoryMock.Object,
+            _profileServiceMock.Object,
+            _userRepositoryMock.Object,
+            _roleRepositoryMock.Object,
+            _storageServiceMock.Object,
+            _loggerMock.Object);
 
         // Por defecto, perfil completo
         _profileServiceMock

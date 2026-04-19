@@ -154,7 +154,7 @@ public class PersonService : BaseService, IPersonService
 
             var person = await _personRepository.GetByIdAsync(id, cancellationToken);
 
-            if (person == null || !person.IsActive)
+            if (person == null)
                 return ApiResponse<PersonResponseDto>.ErrorResponse("Persona no encontrada");
 
             if (!string.IsNullOrWhiteSpace(request.FirstName))
@@ -174,6 +174,9 @@ public class PersonService : BaseService, IPersonService
 
             if (request.DocumentTypeId.HasValue)
                 person.DocumentTypeId = request.DocumentTypeId.Value;
+
+            if (request.IsActive.HasValue)
+                person.IsActive = request.IsActive.Value;
 
             // Crear o actualizar Contact asociado
             Contact? contact = null;
