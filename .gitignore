@@ -64,3 +64,9 @@ appsettings.*.local.json
 # Uploads de usuarios (imágenes, archivos) — no versionar, van a storage externo
 src/GoldenGems.API/wwwroot/uploads/**
 !src/GoldenGems.API/wwwroot/uploads/.gitkeep
+
+# Database dumps (contienen datos sensibles: hashes de passwords, emails, info personal)
+goldengems_dump.sql
+*_dump.sql
+*.dump.sql
+*.backup

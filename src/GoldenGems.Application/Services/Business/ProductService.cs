@@ -87,6 +87,41 @@ public class ProductService : BaseService, IProductService
         }
     }
 
+    public async Task<ApiResponse<List<ProductResponseDto>>> GetAllByCompanyIdAsync(Guid companyId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var products = await _productRepository.GetAllByCompanyIdAsync(companyId, cancellationToken);
+            return ApiResponse<List<ProductResponseDto>>.SuccessResponse(products.Select(MapToDto).ToList(), $"Se encontraron {products.Count} productos");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener productos (admin) por empresa: {CompanyId}", companyId);
+            return ApiResponse<List<ProductResponseDto>>.ErrorResponse("Error al obtener los productos.");
+        }
+    }
+
+    public async Task<ApiResponse<ProductResponseDto>> ToggleStatusAsync(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var product = await _productRepository.GetByIdIgnoreActiveAsync(id, cancellationToken);
+            if (product == null)
+                return ApiResponse<ProductResponseDto>.ErrorResponse("Producto no encontrado.");
+
+            product.IsActive = !product.IsActive;
+            var updated = await _productRepository.UpdateAsync(product, cancellationToken);
+
+            _logger.LogInformation("Estado del producto {Id} cambiado a: {Status}", id, updated.IsActive ? "Activo" : "Inactivo");
+            return ApiResponse<ProductResponseDto>.SuccessResponse(MapToDto(updated), updated.IsActive ? "Producto activado." : "Producto desactivado.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al cambiar estado del producto: {Id}", id);
+            return ApiResponse<ProductResponseDto>.ErrorResponse("Error al cambiar el estado del producto.");
+        }
+    }
+
     public async Task<ApiResponse<List<ProductResponseDto>>> GetByProductTypeIdAsync(Guid productTypeId, CancellationToken cancellationToken)
     {
         try

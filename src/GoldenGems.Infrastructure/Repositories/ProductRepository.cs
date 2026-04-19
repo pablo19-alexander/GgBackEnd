@@ -28,6 +28,22 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Product>> GetAllByCompanyIdAsync(Guid companyId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Products.AsNoTracking()
+            .Include(p => p.ProductType)
+            .Include(p => p.Images.Where(i => i.IsPrimary && i.IsActive))
+            .Where(p => p.CompanyId == companyId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Product?> GetByIdIgnoreActiveAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Products
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+    }
+
     public async Task<List<Product>> GetByProductTypeIdAsync(Guid productTypeId, CancellationToken cancellationToken = default)
     {
         return await _context.Products.AsNoTracking()
