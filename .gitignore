@@ -70,3 +70,6 @@ goldengems_dump.sql
 *_dump.sql
 *.dump.sql
 *.backup
+*.sql
+# MCP config (contiene connection strings con credenciales)
+.mcp.json
