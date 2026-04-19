@@ -44,6 +44,14 @@ public class ProductController : ControllerBase
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/by-company/{companyId:guid}")]
+    public async Task<IActionResult> GetAllByCompanyAdmin(Guid companyId, CancellationToken cancellationToken)
+    {
+        var result = await _productService.GetAllByCompanyIdAsync(companyId, cancellationToken);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     [AllowAnonymous]
     [HttpGet("by-type/{productTypeId:guid}")]
     public async Task<IActionResult> GetByType(Guid productTypeId, CancellationToken cancellationToken)
@@ -76,5 +84,13 @@ public class ProductController : ControllerBase
     {
         var result = await _productService.DeleteAsync(id, cancellationToken);
         return result.Success ? Ok(result) : NotFound(result);
+    }
+
+    [Authorize]
+    [HttpPatch("{id:guid}/toggle-status")]
+    public async Task<IActionResult> ToggleStatus(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _productService.ToggleStatusAsync(id, cancellationToken);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 }
