@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>GoldenGems.API</RootNamespace>
+    <UserSecretsId>536cb3dc-6f37-43c8-b050-9154bb7205da</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
